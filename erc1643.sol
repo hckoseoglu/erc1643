@@ -46,16 +46,24 @@ contract DocumentManager is IERC1643 {
     }
 
     function removeDocument(bytes32 _name) public override {
+        bool arrivedIdx = false;
+        for(uint256 i = 0; i < noOfDocs; i++){
+            if(_docNames[i] == _name){
+                arrivedIdx = true;
+            }
+            if(arrivedIdx){
+                _docNames[i] = _docNames[i + 1];
+            }
+        }
         Document memory doc = _documents[_name];
         require(doc.timestamp != 0);
         delete _documents[_name];
         noOfDocs -= 1;
         emit DocumentRemoved(_name, doc.uri, doc.documentHash);
-        //Todo update docNames
     }
 
     function getAllDocuments() public view override returns (bytes32[] memory){
-        bytes32[] memory names = new bytes32[](1);
+        bytes32[] memory names = new bytes32[](noOfDocs);
         for(uint256 i = 0; i < noOfDocs; i++){
             names[i] = _docNames[i];
         }
